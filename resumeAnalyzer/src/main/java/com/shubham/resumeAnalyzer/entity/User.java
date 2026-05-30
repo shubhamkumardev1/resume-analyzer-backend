@@ -2,7 +2,11 @@ package com.shubham.resumeAnalyzer.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import jakarta.persistence.OneToMany;
+import lombok.Builder.Default;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -14,6 +18,12 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 public class User {
+    @OneToMany(
+            mappedBy = "user",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<Resume> resumes = new ArrayList<>();
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
