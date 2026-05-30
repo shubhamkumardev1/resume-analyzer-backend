@@ -1,6 +1,7 @@
 package com.shubham.resumeAnalyzer.controller;
 
 import com.shubham.resumeAnalyzer.dto.auth.AuthResponse;
+import com.shubham.resumeAnalyzer.dto.auth.LoginRequest;
 import com.shubham.resumeAnalyzer.dto.auth.RegisterRequest;
 import com.shubham.resumeAnalyzer.service.AuthService;
 import jakarta.validation.Valid;
@@ -18,5 +19,10 @@ public class AuthController {
     @PostMapping("/register")
     public AuthResponse register(@Valid @RequestBody RegisterRequest request){
         return authService.register(request);
+    }
+    @PostMapping("/login")
+    public AuthResponse login(@Valid @RequestBody LoginRequest request ){
+        System.out.println("Login!");
+        return authService.login(request);
     }
 }
