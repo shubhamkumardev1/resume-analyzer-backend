@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: resume-analyzer
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/resume_analyzer
+    username: root
+    password: binomial
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+    show-sql: true
+
+    properties:
+      hibernate:
+        format_sql: true
+
+server:
+  port: 8080
