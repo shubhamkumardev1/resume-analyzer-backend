@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "users")
@@ -31,8 +32,8 @@ public class User {
     private Role role;
 
     @Column(name = "created_at" , nullable = false)
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
 
     @Column(name = "updated_at",  nullable = false)
-    private LocalDate updatedAt;
+    private LocalDateTime updatedAt;
 }
