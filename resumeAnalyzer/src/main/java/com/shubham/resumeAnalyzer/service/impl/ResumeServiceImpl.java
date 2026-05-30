@@ -25,9 +25,7 @@ public class ResumeServiceImpl
     private final ResumeRepository resumeRepository;
     private final UserRepository userRepository;
 
-    @Override
-    public ResumeResponse createResume(
-            ResumeRequest request) {
+    private User getCurrentUser() {
 
         Authentication authentication =
                 SecurityContextHolder
@@ -37,10 +35,16 @@ public class ResumeServiceImpl
         String email =
                 authentication.getName();
 
-        User user =
-                userRepository
-                        .findByEmail(email)
-                        .orElseThrow();
+        return userRepository
+                .findByEmail(email)
+                .orElseThrow();
+    }
+
+    @Override
+    public ResumeResponse createResume(
+            ResumeRequest request) {
+
+        User user = getCurrentUser();
 
         Resume resume =
                 Resume.builder()
@@ -74,18 +78,7 @@ public class ResumeServiceImpl
     @Override
     public List<ResumeResponse> getMyResumes() {
 
-        Authentication authentication =
-                SecurityContextHolder
-                        .getContext()
-                        .getAuthentication();
-
-        String email =
-                authentication.getName();
-
-        User user =
-                userRepository
-                        .findByEmail(email)
-                        .orElseThrow();
+        User user = getCurrentUser();
 
         return resumeRepository
                 .findByUser(user)
@@ -109,18 +102,7 @@ public class ResumeServiceImpl
     @Override
     public void deleteResume(Long id) {
 
-        Authentication authentication =
-                SecurityContextHolder
-                        .getContext()
-                        .getAuthentication();
-
-        String email =
-                authentication.getName();
-
-        User user =
-                userRepository
-                        .findByEmail(email)
-                        .orElseThrow();
+        User user = getCurrentUser();
 
         Resume resume =
                 resumeRepository
@@ -134,5 +116,69 @@ public class ResumeServiceImpl
                                 ));
 
         resumeRepository.delete(resume);
+    }
+    @Override
+    public ResumeResponse getResumeById(
+            Long id) {
+
+        User user = getCurrentUser();
+
+        Resume resume =
+                resumeRepository
+                        .findByIdAndUser(
+                                id,
+                                user
+                        )
+                        .orElseThrow(() ->
+                                new ResumeNotFoundException(
+                                        "Resume not found"
+                                ));
+
+        return ResumeResponse.builder()
+                .id(resume.getId())
+                .title(resume.getTitle())
+                .status(
+                        resume.getStatus().name()
+                )
+                .build();
+    }
+    @Override
+    public ResumeResponse updateResume(
+            Long id,
+            ResumeRequest request) {
+
+        User user = getCurrentUser();
+
+        Resume resume =
+                resumeRepository
+                        .findByIdAndUser(
+                                id,
+                                user
+                        )
+                        .orElseThrow(() ->
+                                new ResumeNotFoundException(
+                                        "Resume not found"
+                                ));
+
+        resume.setTitle(
+                request.getTitle()
+        );
+
+        resume.setUpdatedAt(
+                LocalDateTime.now()
+        );
+
+        Resume updatedResume =
+                resumeRepository.save(resume);
+
+        return ResumeResponse.builder()
+                .id(updatedResume.getId())
+                .title(updatedResume.getTitle())
+                .status(
+                        updatedResume
+                                .getStatus()
+                                .name()
+                )
+                .build();
     }
 }

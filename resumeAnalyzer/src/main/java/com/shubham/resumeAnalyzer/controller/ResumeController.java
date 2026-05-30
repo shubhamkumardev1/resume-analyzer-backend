@@ -41,4 +41,25 @@ public class ResumeController {
 
         return "Resume deleted successfully";
     }
+    @GetMapping("/{id}")
+    public ResumeResponse getResumeById(
+            @PathVariable Long id) {
+
+        return resumeService
+                .getResumeById(id);
+    }
+    @PutMapping("/{id}")
+    public ResumeResponse updateResume(
+            @PathVariable Long id,
+
+            @Valid
+            @RequestBody
+            ResumeRequest request) {
+
+        return resumeService
+                .updateResume(
+                        id,
+                        request
+                );
+    }
 }
