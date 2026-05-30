@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import com.shubham.resumeAnalyzer.exception.ResumeNotFoundException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -103,5 +104,35 @@ public class ResumeServiceImpl
                                 .build()
                 )
                 .toList();
+    }
+
+    @Override
+    public void deleteResume(Long id) {
+
+        Authentication authentication =
+                SecurityContextHolder
+                        .getContext()
+                        .getAuthentication();
+
+        String email =
+                authentication.getName();
+
+        User user =
+                userRepository
+                        .findByEmail(email)
+                        .orElseThrow();
+
+        Resume resume =
+                resumeRepository
+                        .findByIdAndUser(
+                                id,
+                                user
+                        )
+                        .orElseThrow(() ->
+                                new ResumeNotFoundException(
+                                        "Resume not found"
+                                ));
+
+        resumeRepository.delete(resume);
     }
 }

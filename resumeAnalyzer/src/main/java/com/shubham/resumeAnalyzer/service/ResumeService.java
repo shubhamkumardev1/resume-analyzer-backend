@@ -11,4 +11,6 @@ public interface ResumeService {
             ResumeRequest request);
 
     List<ResumeResponse> getMyResumes();
+
+    void deleteResume(Long id);
 }

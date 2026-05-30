@@ -13,4 +13,15 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.CONFLICT)
                 .body(e.getMessage());
     }
+    @ExceptionHandler(
+            ResumeNotFoundException.class
+    )
+    public ResponseEntity<String>
+    handleResumeNotFoundException(
+            ResumeNotFoundException ex) {
+
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(ex.getMessage());
+    }
 }

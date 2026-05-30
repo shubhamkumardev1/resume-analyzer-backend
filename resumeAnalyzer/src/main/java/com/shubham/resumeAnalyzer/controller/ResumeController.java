@@ -6,6 +6,8 @@ import com.shubham.resumeAnalyzer.service.ResumeService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 
@@ -30,5 +32,13 @@ public class ResumeController {
 
         return resumeService
                 .getMyResumes();
+    }
+    @DeleteMapping("/{id}")
+    public String deleteResume(
+            @PathVariable Long id) {
+
+        resumeService.deleteResume(id);
+
+        return "Resume deleted successfully";
     }
 }
