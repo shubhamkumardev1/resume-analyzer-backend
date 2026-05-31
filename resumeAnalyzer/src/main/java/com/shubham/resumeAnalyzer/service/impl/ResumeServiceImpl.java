@@ -8,6 +8,7 @@ import com.shubham.resumeAnalyzer.entity.User;
 import com.shubham.resumeAnalyzer.repository.ResumeRepository;
 import com.shubham.resumeAnalyzer.repository.UserRepository;
 import com.shubham.resumeAnalyzer.service.FileStorageService;
+import com.shubham.resumeAnalyzer.service.ResumeParserService;
 import com.shubham.resumeAnalyzer.service.ResumeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -24,6 +25,7 @@ import java.util.List;
 public class ResumeServiceImpl
         implements ResumeService {
 
+    private final ResumeParserService resumeParserService;
     private final FileStorageService fileStorageService;
     private final ResumeRepository resumeRepository;
     private final UserRepository userRepository;
@@ -194,6 +196,9 @@ public class ResumeServiceImpl
         String filePath =
                 fileStorageService
                         .storeFile(file);
+        String extractedText =
+                resumeParserService
+                        .extractText(filePath);
 
         Resume resume =
                 Resume.builder()
@@ -202,6 +207,9 @@ public class ResumeServiceImpl
                                 file.getOriginalFilename()
                         )
                         .filePath(filePath)
+                        .extractedText(
+                                extractedText
+                        )
                         .status(
                                 ResumeStatus.UPLOADED
                         )

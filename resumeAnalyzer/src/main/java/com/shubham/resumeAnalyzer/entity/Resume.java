@@ -34,4 +34,7 @@ public class Resume {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    @Column(columnDefinition = "TEXT")
+    private String extractedText;
 }
