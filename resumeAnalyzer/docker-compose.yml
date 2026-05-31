@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+
+    environment:
+      MYSQL_ROOT_PASSWORD: binomial
+      MYSQL_DATABASE: resume_analyzer
+
+    ports:
+      - "3306:3306"
+
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  redis:
+    image: redis:7
+    container_name: redis
+
+    ports:
+      - "6379:6379"
+
+  app:
+    build: ..
+
+    environment:
+        DB_URL: jdbc:mysql://mysql:3306/resume_analyzer
+        DB_USERNAME: root
+        DB_PASSWORD: binomial
+
+        REDIS_HOST: redis
+        REDIS_PORT: 6379
+
+    container_name: resume-analyzer
+
+    ports:
+      - "8080:8080"
+
+    depends_on:
+      - mysql
+      - redis
+
+volumes:
+  mysql-data:

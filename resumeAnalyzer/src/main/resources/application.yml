@@ -3,9 +3,9 @@ spring:
     name: resume-analyzer
 
   datasource:
-    url: jdbc:mysql://localhost:3306/resume_analyzer
-    username: root
-    password: binomial
+    url: ${DB_URL:jdbc:mysql://localhost:3306/resume_analyzer}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:binomial}
 
   jpa:
     hibernate:
@@ -19,8 +19,8 @@ spring:
 
   data:
     redis:
-      host: localhost
-      port: 6379
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
 
 server:
   port: 8080
