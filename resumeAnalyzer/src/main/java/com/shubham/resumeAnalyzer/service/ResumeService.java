@@ -2,6 +2,7 @@ package com.shubham.resumeAnalyzer.service;
 
 import com.shubham.resumeAnalyzer.dto.resume.ResumeRequest;
 import com.shubham.resumeAnalyzer.dto.resume.ResumeResponse;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -18,5 +19,9 @@ public interface ResumeService {
     ResumeResponse updateResume(
             Long id,
             ResumeRequest request
+    );
+    ResumeResponse uploadResume(
+            String title,
+            MultipartFile file
     );
 }

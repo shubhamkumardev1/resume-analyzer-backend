@@ -7,12 +7,14 @@ import com.shubham.resumeAnalyzer.entity.ResumeStatus;
 import com.shubham.resumeAnalyzer.entity.User;
 import com.shubham.resumeAnalyzer.repository.ResumeRepository;
 import com.shubham.resumeAnalyzer.repository.UserRepository;
+import com.shubham.resumeAnalyzer.service.FileStorageService;
 import com.shubham.resumeAnalyzer.service.ResumeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import com.shubham.resumeAnalyzer.exception.ResumeNotFoundException;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,6 +24,7 @@ import java.util.List;
 public class ResumeServiceImpl
         implements ResumeService {
 
+    private final FileStorageService fileStorageService;
     private final ResumeRepository resumeRepository;
     private final UserRepository userRepository;
 
@@ -176,6 +179,51 @@ public class ResumeServiceImpl
                 .title(updatedResume.getTitle())
                 .status(
                         updatedResume
+                                .getStatus()
+                                .name()
+                )
+                .build();
+    }
+    @Override
+    public ResumeResponse uploadResume(
+            String title,
+            MultipartFile file) {
+
+        User user = getCurrentUser();
+
+        String filePath =
+                fileStorageService
+                        .storeFile(file);
+
+        Resume resume =
+                Resume.builder()
+                        .title(title)
+                        .fileName(
+                                file.getOriginalFilename()
+                        )
+                        .filePath(filePath)
+                        .status(
+                                ResumeStatus.UPLOADED
+                        )
+                        .uploadedAt(
+                                LocalDateTime.now()
+                        )
+                        .updatedAt(
+                                LocalDateTime.now()
+                        )
+                        .user(user)
+                        .build();
+
+        Resume savedResume =
+                resumeRepository.save(
+                        resume
+                );
+
+        return ResumeResponse.builder()
+                .id(savedResume.getId())
+                .title(savedResume.getTitle())
+                .status(
+                        savedResume
                                 .getStatus()
                                 .name()
                 )

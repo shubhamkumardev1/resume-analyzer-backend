@@ -24,4 +24,26 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.NOT_FOUND)
                 .body(ex.getMessage());
     }
+    @ExceptionHandler(
+            InvalidFileException.class
+    )
+    public ResponseEntity<String>
+    handleInvalidFileException(
+            InvalidFileException ex) {
+
+        return ResponseEntity
+                .badRequest()
+                .body(ex.getMessage());
+    }
+    @ExceptionHandler(
+            FileStorageException.class
+    )
+    public ResponseEntity<String>
+    handleFileStorageException(
+            FileStorageException ex) {
+
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ex.getMessage());
+    }
 }
