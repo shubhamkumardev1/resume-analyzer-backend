@@ -1,11 +1,14 @@
 package com.shubham.resumeAnalyzer.service.impl;
 
+import com.shubham.resumeAnalyzer.dto.analysis.AnalysisHistoryResponse;
 import com.shubham.resumeAnalyzer.dto.analysis.AnalysisResponse;
 import com.shubham.resumeAnalyzer.dto.resume.ResumeRequest;
 import com.shubham.resumeAnalyzer.dto.resume.ResumeResponse;
+import com.shubham.resumeAnalyzer.entity.AnalysisResult;
 import com.shubham.resumeAnalyzer.entity.Resume;
 import com.shubham.resumeAnalyzer.entity.ResumeStatus;
 import com.shubham.resumeAnalyzer.entity.User;
+import com.shubham.resumeAnalyzer.repository.AnalysisResultRepository;
 import com.shubham.resumeAnalyzer.repository.ResumeRepository;
 import com.shubham.resumeAnalyzer.repository.UserRepository;
 import com.shubham.resumeAnalyzer.service.ATSAnalyzerService;
@@ -19,6 +22,7 @@ import org.springframework.stereotype.Service;
 import com.shubham.resumeAnalyzer.exception.ResumeNotFoundException;
 import org.springframework.web.multipart.MultipartFile;
 
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -27,6 +31,7 @@ import java.util.List;
 public class ResumeServiceImpl
         implements ResumeService {
 
+    private final AnalysisResultRepository analysisResultRepository;
     private final ResumeParserService resumeParserService;
     private final FileStorageService fileStorageService;
     private final ResumeRepository resumeRepository;
@@ -257,9 +262,90 @@ public class ResumeServiceImpl
                                         "Resume not found"
                                 ));
 
-        return atsAnalyzerService
-                .analyzeResume(
-                        resume.getExtractedText()
-                );
+        AnalysisResponse response =
+                atsAnalyzerService
+                        .analyzeResume(
+                                resume.getExtractedText()
+                        );
+
+        AnalysisResult analysisResult =
+                AnalysisResult.builder()
+                        .score(
+                                response.getScore()
+                        )
+                        .matchedSkills(
+                                String.join(
+                                        ",",
+                                        response.getMatchedSkills()
+                                )
+                        )
+                        .missingSkills(
+                                String.join(
+                                        ",",
+                                        response.getMissingSkills()
+                                )
+                        )
+                        .analyzedAt(
+                                LocalDateTime.now()
+                        )
+                        .resume(resume)
+                        .build();
+
+        analysisResultRepository.save(
+                analysisResult
+        );
+
+        return response;
+    }
+    @Override
+    public List<AnalysisHistoryResponse>
+    getAnalysisHistory(
+            Long resumeId) {
+
+        User user = getCurrentUser();
+
+        Resume resume =
+                resumeRepository
+                        .findByIdAndUser(
+                                resumeId,
+                                user
+                        )
+                        .orElseThrow(() ->
+                                new ResumeNotFoundException(
+                                        "Resume not found"
+                                ));
+
+        return analysisResultRepository
+                .findByResume(
+                        resume
+                )
+                .stream()
+                .map(result ->
+                        AnalysisHistoryResponse
+                                .builder()
+                                .score(
+                                        result.getScore()
+                                )
+                                .matchedSkills(
+                                        List.of(
+                                                result
+                                                        .getMatchedSkills()
+                                                        .split(",")
+                                        )
+                                )
+                                .missingSkills(
+                                        List.of(
+                                                result
+                                                        .getMissingSkills()
+                                                        .split(",")
+                                        )
+                                )
+                                .analyzedAt(
+                                        result
+                                                .getAnalyzedAt()
+                                )
+                                .build()
+                )
+                .toList();
     }
 }

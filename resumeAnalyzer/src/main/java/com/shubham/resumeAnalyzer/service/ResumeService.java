@@ -1,5 +1,6 @@
 package com.shubham.resumeAnalyzer.service;
 
+import com.shubham.resumeAnalyzer.dto.analysis.AnalysisHistoryResponse;
 import com.shubham.resumeAnalyzer.dto.resume.ResumeRequest;
 import com.shubham.resumeAnalyzer.dto.resume.ResumeResponse;
 import org.springframework.web.multipart.MultipartFile;
@@ -13,6 +14,11 @@ public interface ResumeService {
             ResumeRequest request);
 
     AnalysisResponse analyzeResume(
+            Long resumeId
+    );
+
+    List<AnalysisHistoryResponse>
+    getAnalysisHistory(
             Long resumeId
     );
 

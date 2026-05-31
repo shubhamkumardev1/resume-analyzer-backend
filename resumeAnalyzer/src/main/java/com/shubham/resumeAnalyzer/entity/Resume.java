@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "resumes")
@@ -37,4 +39,12 @@ public class Resume {
 
     @Column(columnDefinition = "TEXT")
     private String extractedText;
+
+    @OneToMany(
+            mappedBy = "resume",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<AnalysisResult> analyses =
+            new ArrayList<>();
 }
