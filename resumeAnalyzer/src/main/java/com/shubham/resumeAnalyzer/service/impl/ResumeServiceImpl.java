@@ -15,14 +15,14 @@ import com.shubham.resumeAnalyzer.service.ATSAnalyzerService;
 import com.shubham.resumeAnalyzer.service.FileStorageService;
 import com.shubham.resumeAnalyzer.service.ResumeParserService;
 import com.shubham.resumeAnalyzer.service.ResumeService;
+import org.springframework.cache.annotation.Cacheable;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import com.shubham.resumeAnalyzer.exception.ResumeNotFoundException;
 import org.springframework.web.multipart.MultipartFile;
-
-
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -194,6 +194,11 @@ public class ResumeServiceImpl
                 )
                 .build();
     }
+
+    @CacheEvict(
+            value = "resumeAnalysis",
+            allEntries = true
+    )
     @Override
     public ResumeResponse uploadResume(
             String title,
@@ -245,10 +250,14 @@ public class ResumeServiceImpl
                 )
                 .build();
     }
+
     @Override
+    @Cacheable(
+            value = "resumeAnalysis",
+            key = "#resumeId"
+    )
     public AnalysisResponse analyzeResume(
             Long resumeId) {
-
         User user = getCurrentUser();
 
         Resume resume =
@@ -297,6 +306,7 @@ public class ResumeServiceImpl
 
         return response;
     }
+
     @Override
     public List<AnalysisHistoryResponse>
     getAnalysisHistory(
