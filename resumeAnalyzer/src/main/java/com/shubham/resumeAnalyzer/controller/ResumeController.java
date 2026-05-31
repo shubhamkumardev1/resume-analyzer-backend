@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.multipart.MultipartFile;
+import com.shubham.resumeAnalyzer.dto.analysis.AnalysisResponse;
 
 import java.util.List;
 
@@ -75,5 +76,12 @@ public class ResumeController {
                         title,
                         file
                 );
+    }
+    @GetMapping("/{id}/analyze")
+    public AnalysisResponse analyzeResume(
+            @PathVariable Long id) {
+
+        return resumeService
+                .analyzeResume(id);
     }
 }

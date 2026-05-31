@@ -1,5 +1,6 @@
 package com.shubham.resumeAnalyzer.service.impl;
 
+import com.shubham.resumeAnalyzer.dto.analysis.AnalysisResponse;
 import com.shubham.resumeAnalyzer.dto.resume.ResumeRequest;
 import com.shubham.resumeAnalyzer.dto.resume.ResumeResponse;
 import com.shubham.resumeAnalyzer.entity.Resume;
@@ -7,6 +8,7 @@ import com.shubham.resumeAnalyzer.entity.ResumeStatus;
 import com.shubham.resumeAnalyzer.entity.User;
 import com.shubham.resumeAnalyzer.repository.ResumeRepository;
 import com.shubham.resumeAnalyzer.repository.UserRepository;
+import com.shubham.resumeAnalyzer.service.ATSAnalyzerService;
 import com.shubham.resumeAnalyzer.service.FileStorageService;
 import com.shubham.resumeAnalyzer.service.ResumeParserService;
 import com.shubham.resumeAnalyzer.service.ResumeService;
@@ -29,6 +31,7 @@ public class ResumeServiceImpl
     private final FileStorageService fileStorageService;
     private final ResumeRepository resumeRepository;
     private final UserRepository userRepository;
+    private final ATSAnalyzerService atsAnalyzerService;
 
     private User getCurrentUser() {
 
@@ -236,5 +239,27 @@ public class ResumeServiceImpl
                                 .name()
                 )
                 .build();
+    }
+    @Override
+    public AnalysisResponse analyzeResume(
+            Long resumeId) {
+
+        User user = getCurrentUser();
+
+        Resume resume =
+                resumeRepository
+                        .findByIdAndUser(
+                                resumeId,
+                                user
+                        )
+                        .orElseThrow(() ->
+                                new ResumeNotFoundException(
+                                        "Resume not found"
+                                ));
+
+        return atsAnalyzerService
+                .analyzeResume(
+                        resume.getExtractedText()
+                );
     }
 }
